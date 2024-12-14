@@ -1,34 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
 import './App.css'
+import * as starshipService from './services/starshipService'
+import StarshipSearch from './components/StarshipSearch'
+import StarshipList from './components/StarshipList'
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [starships, setStarships] = useState([])
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  const fetchData = async (searchTerm = '') => {
+    try {
+      setLoading(true)
+      const data = await starshipService.getStarships(searchTerm)
+      setStarships(data.results || [])
+      setError('')
+    } catch {
+      setError('Failed to fetch starships. Please try again later.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <main>
+      <h1>Star Wars Starships</h1>
+      <StarshipSearch fetchData={fetchData} />
+      {error ? (
+        <p className="error">{error}</p>
+      ) : loading ? (
+        <p>Loading...</p>
+      ) : (
+        <StarshipList starships={starships} />
+      )}
+    </main>
   )
 }
 
