@@ -1,4 +1,4 @@
-const BASE_URL = `https://swapi.dev/api/starships`
+const BASE_URL = `https://swapi.py4e.com/api/starships`
 
 export const getStarships = async (searchTerm = '') => {
   try {
